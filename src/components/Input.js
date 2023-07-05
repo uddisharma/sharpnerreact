@@ -1,25 +1,33 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 
 export default function Input() {
+  const myRef = useRef();
+  useEffect(() => {
+    myRef.current.focus();
+  }, []);
   const [value, setValue] = useState({
     name: "",
     age: "",
+    college: "",
   });
+  const { name, age, college } = value;
   let extisingmember = JSON.parse(localStorage.getItem("member"));
   let data = extisingmember ? extisingmember : [];
 
-  const { name, age } = value;
   const handleClick = () => {
     document.getElementById("btn").style.backgroundColor = "green";
-    if (name == "") {
+    if (name === "") {
       return toast.error("Please enter a name");
     }
-    if (age == "") {
+    if (age === "") {
       return toast.error("Please enter age");
     }
     if (age > 30) {
       return toast.error("Age must be smaller than 30");
+    }
+    if (college === "") {
+      return toast.error("Please Enter  College Name");
     }
     data.push(value);
     localStorage.setItem("member", JSON.stringify(data));
@@ -42,6 +50,7 @@ export default function Input() {
             {/* <span className="text-gray-500 sm:text-sm">$</span> */}
           </div>
           <input
+            ref={myRef}
             value={name}
             onChange={(e) => {
               setValue({ ...value, name: e.target.value });
@@ -65,6 +74,18 @@ export default function Input() {
             placeholder="Age"
           />
           <br />
+          <input
+            value={college}
+            onChange={(e) => {
+              setValue({ ...value, college: e.target.value });
+            }}
+            type="text"
+            name="college"
+            id="college"
+            className="block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="College Name"
+          />
+          <br />
           <button
             onClick={() => {
               handleClick();
@@ -77,20 +98,6 @@ export default function Input() {
           >
             Add
           </button>
-          {/* <div className="absolute inset-y-0 right-0 flex items-center">
-          <label htmlFor="currency" className="sr-only">
-            Currency
-          </label>
-          <select
-            id="currency"
-            name="currency"
-            className="h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-          >
-            <option>USD</option>
-            <option>CAD</option>
-            <option>EUR</option>
-          </select>
-        </div> */}
         </div>
         {data.length > 0 ? (
           <table class="table-auto">
@@ -99,6 +106,7 @@ export default function Input() {
                 <th>#Id</th>
                 <th>Name</th>
                 <th>Age</th>
+                <th>College</th>
               </tr>
             </thead>
             <tbody>
@@ -108,6 +116,7 @@ export default function Input() {
                     <td>{i + 1}</td>
                     <td>{e.name}</td>
                     <td>{e.age}</td>
+                    <td>{e.college}</td>
                   </tr>
                 ))}
             </tbody>
