@@ -6,13 +6,16 @@ export default function Input() {
   useEffect(() => {
     myRef.current.focus();
   }, []);
+
   const [value, setValue] = useState({
+    id: "",
     name: "",
     age: "",
     college: "",
   });
   const { name, age, college } = value;
   let extisingmember = JSON.parse(localStorage.getItem("member"));
+
   let data = extisingmember ? extisingmember : [];
 
   const handleClick = () => {
@@ -32,9 +35,30 @@ export default function Input() {
     data.push(value);
     localStorage.setItem("member", JSON.stringify(data));
     toast.success("Member successfully added !");
-    setValue({ ...value, name: "", age: "" });
+    setValue({ ...value, name: "", age: "", college: "" });
   };
-
+  const deleteMember = (id) => {
+    data = data.filter((e) => {
+      return e.id !== id;
+    });
+    localStorage.setItem("member", JSON.stringify(data));
+    window.location.reload();
+  };
+  const EditMember = (id) => {
+    const userDetail = data.filter((e) => {
+      return e.id === id;
+    });
+    setValue({
+      ...userDetail,
+      name: userDetail[0].name,
+      age: userDetail[0].age,
+      college: userDetail[0].college,
+    });
+    data = data.filter((e) => {
+      return e.id !== id;
+    });
+    localStorage.setItem("member", JSON.stringify(data));
+  };
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
@@ -46,14 +70,12 @@ export default function Input() {
           Add Member
         </label>
         <div className="relative mt-2 rounded-md shadow-sm">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            {/* <span className="text-gray-500 sm:text-sm">$</span> */}
-          </div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"></div>
           <input
             ref={myRef}
             value={name}
             onChange={(e) => {
-              setValue({ ...value, name: e.target.value });
+              setValue({ ...value, name: e.target.value, id: Math.random() });
             }}
             type="text"
             name="name"
@@ -90,13 +112,13 @@ export default function Input() {
             onClick={() => {
               handleClick();
             }}
-            disabled={name == ""}
-            style={{ backgroundColor: name == "" ? "red" : "blue" }}
+            disabled={name === ""}
+            style={{ backgroundColor: name === "" ? "red" : "blue" }}
             type="button"
             id="btn"
             class="  text-white v bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
           >
-            Add
+            Add Member
           </button>
         </div>
         {data.length > 0 ? (
@@ -107,16 +129,44 @@ export default function Input() {
                 <th>Name</th>
                 <th>Age</th>
                 <th>College</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {data.length > 0 &&
                 data.map((e, i) => (
-                  <tr>
+                  <tr key={i}>
                     <td>{i + 1}</td>
                     <td>{e.name}</td>
                     <td>{e.age}</td>
                     <td>{e.college}</td>
+                    <td
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <button
+                        onClick={() => {
+                          deleteMember(e.id);
+                        }}
+                        type="button"
+                        id="btn"
+                        class="  text-white v bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                      >
+                        delete
+                      </button>
+                      <button
+                        onClick={() => {
+                          EditMember(e.id);
+                        }}
+                        type="button"
+                        id="btn"
+                        class="  text-white v bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                      >
+                        Edit
+                      </button>
+                    </td>
                   </tr>
                 ))}
             </tbody>
